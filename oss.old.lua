@@ -6,7 +6,6 @@ local args = {}
 function get_filename(res)
     local filename = ngx.re.match(res,'(.+)filename="(.+)"(.*)')
     if filename then
-        ngx.log(ngx.INFO, "file name : ", filename[2])
         return filename[2]
     end
 end
@@ -98,7 +97,7 @@ if  method == "POST" then
             return
         end
 
-        ngx.log(ngx.INFO, "reponse body : ", res.body)
+        ngx.log(ngx.ERR, "reponse body : ", res.body)
         ngx.say(res.body)
 
     end 
