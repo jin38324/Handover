@@ -19,14 +19,14 @@ function get_fieldname(res)
 end
 
 function handle_uploading()
-    local chunk_size = 5*1024
+    local chunk_size = 5*1024*1024
     local form, err = upload:new(chunk_size)
     if not form then
         ngx.log(ngx.ERR, "failed to new upload: ", err)
         ngx.exit(500)
     end
 
-    form:set_timeout(1000)
+    form:set_timeout(6000)
 
     file_name = nil
     file_exist = nil
