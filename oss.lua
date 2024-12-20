@@ -19,14 +19,14 @@ function get_fieldname(res)
 end
 
 function handle_uploading()
-    local chunk_size = 5*1024*1024
+    local chunk_size = 5*1024
     local form, err = upload:new(chunk_size)
     if not form then
         ngx.log(ngx.ERR, "failed to new upload: ", err)
         ngx.exit(500)
     end
 
-    form:set_timeout(6000)
+    form:set_timeout(60000)
 
     file_name = nil
     file_exist = nil
@@ -44,27 +44,27 @@ function handle_uploading()
             if file_name then
                 file_exist = true
             end
-	    if field_name == nil then 
+            if field_name == nil then 
                 field_name = get_fieldname(res[2])
-	    end
+            end
 
          elseif typ == "body" then
             if file_exist then
-		table.insert(filedata, res)
+                table.insert(filedata, res)
             elseif field_name then 
                args[field_name] = res
             end
 
         elseif typ == "part_end" then
             if file_exist then
-		args["filedata"] = table.concat(filedata)
+                args["filedata"] = table.concat(filedata)
                 file_exist = nil
-		file_name = nil
-		filedata = {}
+                file_name = nil
+                filedata = {}
             end
-	    if field_name then
-		field_name = nil
-	     end
+            if field_name then
+                field_name = nil
+             end
 
         elseif typ == "eof" then
             break
@@ -86,6 +86,7 @@ if  method == "POST" then
     handle_uploading()
     local putUrl = args["putUrl"]
     if  putUrl and args["filedata"] then 
+        ngx.log(ngx.INFO, "putUrl : ", putUrl)
         local  forward_url = ngx.decode_base64(putUrl)
         local res, err = httpc:request_uri(forward_url, {
             method = "PUT",
@@ -106,4 +107,3 @@ else
     ngx.status = 400
     ngx.say("only support POST request")
     ngx.exit(400)
-end
