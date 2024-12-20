@@ -107,3 +107,4 @@ else
     ngx.status = 400
     ngx.say("only support POST request")
     ngx.exit(400)
+end
