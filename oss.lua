@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 -- version: 20250117
-=======
--- version: 20241223
->>>>>>> 806e392d7a2d5e5bf21566cbdb48e10ac9276452
 
 local upload = require "resty.upload"
 local str = require "resty.string"
