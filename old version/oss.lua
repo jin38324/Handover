@@ -1,5 +1,3 @@
--- version: 20250117
-
 local upload = require "resty.upload"
 local str = require "resty.string"
 
@@ -112,8 +110,6 @@ if  method == "POST" then
         end
         --处理服务器返回
         ngx.log(ngx.ERR, "reponse body : ", res.body)
-        local resMsg = res.body
-        ngx.header["Content-Length"] = #resMsg + 1
         ngx.say(res.body)
 
     end 
