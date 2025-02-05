@@ -1,4 +1,4 @@
--- version: 20250123
+-- version: 20250117
 
 local upload = require "resty.upload"
 local str = require "resty.string"
@@ -28,10 +28,8 @@ function handle_uploading()
     --创建解析post请求的form对象
     local form, err = upload:new(chunk_size)
     if not form then
-        ngx.status = ngx.HTTP_INTERNAL_SERVER_ERROR
         ngx.log(ngx.ERR, "failed to new upload: ", err)
-        ngx.say("failed to new upload")
-        return ngx.exit(500)
+        ngx.exit(500)
     end
     --设置读超时时间
     form:set_timeout(60000)
@@ -44,10 +42,9 @@ function handle_uploading()
         local typ, res, err = form:read()
         --处理解析异常
         if not typ then
-             ngx.status = ngx.HTTP_INTERNAL_SERVER_ERROR
              ngx.log(ngx.ERR, "parse post form error,format error:",err)
              ngx.say("failed to read: ", err)
-             return ngx.exit(500)
+             return
         end
         --处理请求头
         if typ == "header" then
@@ -90,6 +87,8 @@ end
 --创建发起put请求的httpClient
 local httpc = require("resty.http").new()
 httpc:set_timeout(60000)
+ok, err = httpc:set_keepalive(60000,512)
+
 
 local method = ngx.req.get_method()
 --只处理POST请求
@@ -107,10 +106,9 @@ if  method == "POST" then
         })
         --处理服务器未响应异常
         if not res then
-            ngx.status = ngx.HTTP_INTERNAL_SERVER_ERROR
+            ngx.status = 500
             ngx.log(ngx.ERR, "request failed: ", err)
-            ngx.say("pub request failed")
-            return ngx.exit(500)
+            return
         end
         --处理服务器返回
         ngx.log(ngx.ERR, "reponse body : ", res.body)
@@ -121,7 +119,7 @@ if  method == "POST" then
     end 
 else  
     --处理GET方法
-    ngx.status = ngx.HTTP_INTERNAL_SERVER_ERROR
+    ngx.status = 400
     ngx.say("only support POST request")
-    return ngx.exit(500)
+    ngx.exit(400)
 end
